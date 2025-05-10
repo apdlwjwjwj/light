@@ -14,7 +14,7 @@ class PasswordViewModel : ViewModel() {
         if (_password.value.length < 4) {
             _password.value += digit
             if (_password.value.length == 4) {
-                _isValid.value = true // 실제 검증은 UI에서!
+                _isValid.value = true
             }
         }
     }
