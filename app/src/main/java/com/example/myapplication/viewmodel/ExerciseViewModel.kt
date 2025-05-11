@@ -11,7 +11,10 @@ class ExerciseViewModel : ViewModel() {
         private set
 
     fun selectMode(index: Int) {
-        uiState = uiState.copy(selectedModeIndex = index)
+        uiState = uiState.copy(selectedModeIndex = index, detailLevel = 1)
+    }
+    fun setDetailLevel(level: Int) {
+        uiState = uiState.copy(detailLevel = level)
     }
     fun changeWeight(delta: Int) {
         uiState = uiState.copy(weight = (uiState.weight + delta).coerceIn(0, 200))
@@ -27,5 +30,11 @@ class ExerciseViewModel : ViewModel() {
     }
     fun resetState() {
         uiState = ExerciseUiState()
+    }
+    fun setSafetyAssist(idx: Int) {
+        uiState = uiState.copy(safetyAssist = idx)
+    }
+    fun setWeight(newWeight: Int) {
+        uiState = uiState.copy(weight = newWeight.coerceIn(0, 100)) // 0~100kg 제한
     }
 }

@@ -12,16 +12,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.viewmodel.ExerciseViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 
+
 @Composable
 fun ExerciseScreen(
     userName: String,
     viewModel: ExerciseViewModel = viewModel(),
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onStartWorkout: () -> Unit
 ) {
     BackHandler(enabled = true) { }
 
@@ -60,7 +63,6 @@ fun ExerciseScreen(
 
         Spacer(Modifier.height(16.dp))
 
-        // 운동 모드 LazyRow
         Text(
             text = "운동 모드",
             color = Color.White,
@@ -114,16 +116,96 @@ fun ExerciseScreen(
                     color = Color.Gray,
                     fontSize = 10.sp
                 )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (modes[state.selectedModeIndex] == "일반" || modes[state.selectedModeIndex] == "등속성") {
+                    Text(
+                        text = "세부 설정 필요 없음",
+                        color = Color.LightGray,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                } else {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if(modes[state.selectedModeIndex] == "밴드"){
+                            (1..5).forEach { level ->
+                                Button(
+                                    onClick = { viewModel.setDetailLevel(level) },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (state.detailLevel == level) Color(
+                                            0xFF4B89DC
+                                        ) else Color.DarkGray
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(40.dp),
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Text(
+                                        "$level 단계",
+                                        color = Color.White,
+                                        maxLines = 1,
+                                        softWrap = false,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center,
+                                    )
+                                }
+                            }
+                        }
+                        else {
+                            (1..3).forEach { level ->
+                                Button(
+                                    onClick = { viewModel.setDetailLevel(level) },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (state.detailLevel == level) Color(
+                                            0xFF4B89DC
+                                        ) else Color.DarkGray
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .height(40.dp),
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Text(
+                                        "$level 단계",
+                                        color = Color.White,
+                                        maxLines = 1,
+                                        softWrap = false,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                }
             }
         }
 
         Spacer(Modifier.height(16.dp))
 
-        Text(
-            text = "운동 강도",
-            color = Color.White,
-            style = MaterialTheme.typography.titleMedium
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "운동 강도",
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium
+            )
+            val totalVolume = state.weight * state.sets * state.reps
+            Text(
+                text = "총 볼륨 : $totalVolume kg",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
 
         Card(
             modifier = Modifier
@@ -177,6 +259,52 @@ fun ExerciseScreen(
             }
         }
 
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "안전보조",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                val options = listOf("꺼짐", "최소", "최대")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    options.forEachIndexed { idx, label ->
+                        Button(
+                            onClick = { viewModel.setSafetyAssist(idx) },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if (state.safetyAssist == idx) Color(0xFF4B89DC) else Color.DarkGray
+                            ),
+                            modifier = Modifier.weight(1f),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                color = Color.White,
+                                maxLines = 1,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -206,7 +334,7 @@ fun ExerciseScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Button(
-            onClick = { /* TODO */ },
+            onClick = { onStartWorkout() },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4B89DC))
         ) {

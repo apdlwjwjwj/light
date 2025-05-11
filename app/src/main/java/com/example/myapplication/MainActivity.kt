@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.example.myapplication.ui.screen.ExercisingScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,26 +28,39 @@ class MainActivity : ComponentActivity() {
                 val showSplash by splashViewModel.showSplash
 
                 var memberName by remember { mutableStateOf<String?>(null) }
+                var isWorkoutStarted by remember { mutableStateOf(false) }
 
                 if (showSplash) {
                     SplashScreen()
                 } else if (memberName == null) {
                     PasswordInputScreen(
-                        onSuccess = { name ->
-                            memberName = name
-                        },
+                        onSuccess = { name -> memberName = name },
                         viewModel = passwordViewModel
                     )
-                } else {
+                } else if (!isWorkoutStarted) {
                     ExerciseScreen(
                         userName = memberName!!,
                         viewModel = exerciseViewModel,
+                        onLogout = { memberName = null },
+                        onStartWorkout = { isWorkoutStarted = true }
+                    )
+                } else {
+                   ExercisingScreen(
+                        userName = memberName!!,
+                        state = exerciseViewModel.uiState,
+                        modes = exerciseViewModel.modes,
+                        onBack = { isWorkoutStarted = false },
                         onLogout = {
                             memberName = null
-                        }
+                            isWorkoutStarted = false
+                        },
+                       onWeightChange = { newWeight ->
+                           exerciseViewModel.setWeight(newWeight)
+                       }
                     )
                 }
             }
         }
+
     }
 }
