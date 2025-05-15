@@ -17,7 +17,7 @@ class ExerciseViewModel : ViewModel() {
         uiState = uiState.copy(detailLevel = level)
     }
     fun changeWeight(delta: Int) {
-        uiState = uiState.copy(weight = (uiState.weight + delta).coerceIn(0, 200))
+        uiState = uiState.copy(weight = (uiState.weight + delta).coerceIn(0, 100))
     }
     fun changeSets(delta: Int) {
         uiState = uiState.copy(sets = (uiState.sets + delta).coerceIn(1, 20))
